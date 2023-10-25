@@ -1,5 +1,6 @@
 const insertTable = require('../../src/database/insertTable')
 const Talao_pedido = require('../../src/database/models/talao_pedido')
+const Sequelize = require('sequelize')
 
 export default async function getOrders(req, res) {
 
@@ -9,8 +10,15 @@ export default async function getOrders(req, res) {
 
         const response = await Talao_pedido.findAll(
             {
-                order:[['horario_inicio', 'ASC']],
-                raw: true
+                where: {
+                    status: {
+                        [Sequelize.Op.ne]: 'concluido'
+                    }
+                }
+            },
+            {
+                order: [['horario_inicio', 'ASC']],
+                raw: true,
             }
         )
 
@@ -20,7 +28,7 @@ export default async function getOrders(req, res) {
 
     } catch (err) {
         console.error("Error connecting or querying PostgreSQL:", err);
-    } 
+    }
 }
 
 

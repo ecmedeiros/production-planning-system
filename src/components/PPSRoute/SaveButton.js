@@ -39,6 +39,7 @@ const SaveButton = ({ column, orders, machineId }) => {
                     } else {
                         console.log(orders[orderId].horario_fim);
                         orders[orderId].id_maquina = machineId
+                        orders[orderId].status = 'programada'
                         columns_changed.push(orders[orderId]);
                     }
                 }
@@ -57,6 +58,7 @@ const SaveButton = ({ column, orders, machineId }) => {
                         orders[orderIdColumn1].horario_inicio = defaultDate;
                         orders[orderIdColumn1].column_index = null;
                         orders[orderIdColumn1].id_maquina = null;
+                        orders[orderIdColumn1].status = 'aberta'
                         columns_changed.push(orders[orderIdColumn1]);
                     }
                 }

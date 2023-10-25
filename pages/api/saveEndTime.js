@@ -13,6 +13,7 @@ export default async function saveEndTime (req,res) {
             newTime.horario_fim = await newOrder[order].horario_fim
             newTime.horario_inicio = await newOrder[order].horario_inicio
             newTime.id_maquina = await newOrder[order].id_maquina
+            newTime.status = await newOrder[order].status
             
             
             await newTime.save()

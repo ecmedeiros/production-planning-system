@@ -52,6 +52,9 @@ const Talao_pedido = wes.define('talao_pedido', {
     id_maquina : {
         type: Sequelize.INTEGER,
     },
+    status : {
+        type: Sequelize.STRING
+    }
 })
 
 

@@ -28,6 +28,7 @@ const eligo = new Sequelize(eligo_database, user, password, {
     dialect: dialect,
     host: host,
     port: port,
+    logging: false,
     timezone: timezone // Defina o fuso horário correto aqui
 })
 

@@ -5,7 +5,7 @@ async function insertTable() {
   const defaultDate = '1970-01-01T03:00:00.000Z'
   await wes.sync()
 
-  const result = await eligo.query(`
+  const result_eligo_view = await eligo.query(`
   SELECT concat(a.talao,'-',a.SEQUENCIA_TALAO) talao,
   SUM(a.quantidade_processo) AS minutos,
   TO_CHAR(INTERVAL '1 second' * SUM(a.quantidade_processo), 'HH24:MI:SS') AS hora_ajustada,
@@ -102,10 +102,31 @@ AND ip3.descricao IN ('TECIMENTO')
 GROUP BY a.talao, a.SEQUENCIA_TALAO, a.cliente, a.pedido_venda, a.modelo
 order by a.talao
 `);
+  const result_talao_pedidos = await Talao_pedido.findAll({ raw: true })
 
-  let total_tempo = 0
-  result[0].forEach(async row => {
-    total_tempo += Number(row.minutos)
+  const eligo_view_talao = []
+  const talao_pedidos_view = []
+
+  result_eligo_view[0].forEach(async row => {
+    eligo_view_talao.push(row.talao)
+  })
+  
+  result_talao_pedidos.forEach(async row => {
+    talao_pedidos_view.push(row.talao)
+  })
+  const talaos_matched_to_remove =  talao_pedidos_view.filter(talao => !eligo_view_talao.includes(talao))
+
+  talaos_matched_to_remove.forEach(talao => {
+    Talao_pedido.update({
+      status: 'concluido',
+      where: {
+        talao: talao
+      }
+    })
+
+  })
+
+  result_eligo_view[0].forEach(async row => {
     try {
       const newTalao = await Talao_pedido.create({
         talao: row.talao,
@@ -117,7 +138,8 @@ order by a.talao
         modelo: (row.modelo === null ? 'Sem ref.' : row.modelo),
         // id_maquina: '', 
         horario_fim: defaultDate,
-        horario_inicio: defaultDate
+        horario_inicio: defaultDate,
+        status:'aberto'
       })
     } catch (err) {
       if (err.name === 'SequelizeUniqueConstraintError') {
